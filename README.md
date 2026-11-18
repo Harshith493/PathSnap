@@ -1,6 +1,6 @@
 # PathSnap : Distributed Map-Matching & Route Reconstruction
 
-**PES University · ML Hackathon 2026**
+**ML Hackathon 2026**
 
 PathSnap reconstructs vehicle routes from noisy GPS observations by matching each observation to candidate road-network arcs, scoring the candidates with machine-learning models, and decoding a topologically coherent sequence with an HMM and the Viterbi algorithm.
 
