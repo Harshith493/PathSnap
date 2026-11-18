@@ -23,6 +23,79 @@ The project includes data exploration and preprocessing, spatial candidate gener
 - [Reproducibility and known limitations](#reproducibility-and-known-limitations)
 - [AI-use disclosure](#ai-use-disclosure)
 
+---
+
+## Repository layout
+
+The following is the **target layout after applying the cleanup script** included with this kit. The reusable Python package remains in `src/`; runnable entry points are grouped by task; experiment outputs remain under `artifacts/`.
+
+```text
+PathSnap/
+├── src/                                  # Reusable project code
+│   ├── dataset.py                        # Trip loading, projection, route alignment,
+│   │                                     # spatial indexing and candidate generation
+│   ├── features.py                       # 12 features per GPS-observation/candidate pair
+│   ├── models.py                         # Five model definitions and registry
+│   ├── hmm_decoder.py                    # HMM emissions, transitions and Viterbi decoder
+│   ├── metrics.py                        # Observation-level and route-level metrics
+│   ├── visualize.py                      # Folium map-generation functions
+│   └── server.py                         # FastAPI backend
+│
+├── scripts/
+│   ├── eda/run_eda.py
+│   ├── training/train_and_evaluate_models.py
+│   ├── optimization/run_bayesian_optimization_pipeline.py
+│   ├── evaluation/run_hmm_evaluation.py
+│   ├── evaluation/run_evaluator_test_demo.py
+│   ├── visualization/generate_folium_maps.py
+│   ├── visualization/generate_all_evaluator_maps.py
+│   └──  deployment/run_ui.py
+│
+├── templates/
+│   └── index.html                        # Browser evaluator dashboard
+│
+├── evaluator_test/
+│   └── evaluator_test/<trip_id>/         # Ten evaluator demo trips
+│       ├── <trip_id>.track
+│       ├── <trip_id>.nodes
+│       ├── <trip_id>.arcs
+│       └── <trip_id>.route
+│
+├── artifacts/
+│   ├── models/                           # Saved model artifacts (.joblib)
+│   ├── results/                          # CSV/JSON experiment summaries
+│   ├── plots/
+│   │   ├── eda/
+│   │   ├── models/
+│   │   ├── bayesian_opt/
+│   │   ├── hmm/
+│   │   └── maps/
+│   └── maps/                             # Generated interactive HTML maps (local output)
+│
+├── docs/
+│   └── Workflow_Report.md       # Architecture, deployment and viva notes
+│
+├── requirements.txt
+├── .gitignore
+└── README.md
+```
+
+**Why the `scripts/` folder?** These files are executable pipeline entry points, not reusable library modules. The code that implements the pipeline remains in `src/`. The cleanup script inserts a small repository-root bootstrap into each moved script so imports such as `from src.dataset import ...` continue to work and relative paths resolve from the repository root.
+
+## Team and Division of Work
+
+All members collaborated on integration, debugging, validation, documentation and the final demonstration.
+
+| Team member | Primary ownership | Main responsibilities |
+|---|---|---|
+| **Harshitha B.T.** | Core Pipeline & ML Development | Raw data preprocessing, GPS coordinate projection, ground-truth route alignment, road-network processing, spatial indexing, candidate generation, candidate-recall analysis and documentation. |
+| **Harshith R** | System Integration | Feature engineering, model training and comparison, Bayesian hyperparameter optimisation, HMM/Viterbi route reconstruction, FastAPI backend and deployment. |
+| **Janavi Agarwal** | Frontend Development and Visualisation | Evaluator dashboard UI, frontend implementation, interface design, API integration on the client side and presentation of route-reconstruction results. |
+
+**Shared responsibilities:** dataset exploration, debugging, experiment verification, report preparation, presentation and integration testing were collaborative activities.
+
+---
+
 ## System overview
 
 ```text
@@ -57,77 +130,6 @@ GPS track + directed road network
 - **Laptop 2 — evaluator/client:** opens the browser dashboard and sends the selected trip ID to Laptop 1 over the same local network.
 
 The API does not send reference-route data to the browser client. Note, however, that the current public repository contains the evaluator trip `.route` files. They are therefore publicly downloadable from GitHub; the server-side boundary applies to the live API response, not to repository access.
-
-## Repository layout
-
-The following is the **target layout after applying the cleanup script** included with this kit. The reusable Python package remains in `src/`; runnable entry points are grouped by task; experiment outputs remain under `artifacts/`.
-
-```text
-PathSnap/
-├── src/                                  # Reusable project code
-│   ├── dataset.py                        # Trip loading, projection, route alignment,
-│   │                                     # spatial indexing and candidate generation
-│   ├── features.py                       # 12 features per GPS-observation/candidate pair
-│   ├── models.py                         # Five model definitions and registry
-│   ├── hmm_decoder.py                    # HMM emissions, transitions and Viterbi decoder
-│   ├── metrics.py                        # Observation-level and route-level metrics
-│   ├── visualize.py                      # Folium map-generation functions
-│   └── server.py                         # FastAPI backend
-│
-├── scripts/
-│   ├── eda/run_eda.py
-│   ├── training/train_and_evaluate_models.py
-│   ├── optimization/run_bayesian_optimization_pipeline.py
-│   ├── evaluation/run_hmm_evaluation.py
-│   ├── evaluation/run_evaluator_test_demo.py
-│   ├── visualization/generate_folium_maps.py
-│   ├── visualization/generate_all_evaluator_maps.py
-│   ├── deployment/run_ui.py
-│   └── reporting/generate_report.py
-│
-├── templates/
-│   └── index.html                        # Browser evaluator dashboard
-│
-├── evaluator_test/
-│   └── evaluator_test/<trip_id>/         # Ten evaluator demo trips
-│       ├── <trip_id>.track
-│       ├── <trip_id>.nodes
-│       ├── <trip_id>.arcs
-│       └── <trip_id>.route
-│
-├── artifacts/
-│   ├── models/                           # Saved model artifacts (.joblib)
-│   ├── results/                          # CSV/JSON experiment summaries
-│   ├── plots/
-│   │   ├── eda/
-│   │   ├── models/
-│   │   ├── bayesian_opt/
-│   │   ├── hmm/
-│   │   └── maps/
-│   └── maps/                             # Generated interactive HTML maps (local output)
-│
-├── docs/
-│   └── PathSnap_Workflow_Report.md       # Architecture, deployment and viva notes
-│
-├── requirements.txt
-├── .gitignore
-└── README.md
-```
-
-**Why the `scripts/` folder?** These files are executable pipeline entry points, not reusable library modules. The code that implements the pipeline remains in `src/`. The cleanup script inserts a small repository-root bootstrap into each moved script so imports such as `from src.dataset import ...` continue to work and relative paths resolve from the repository root.
-
-## Team and Division of Work
-
-All members collaborated on integration, debugging, validation, documentation and the final demonstration.
-
-| Team member | Primary ownership | Main responsibilities |
-|---|---|---|
-| **Harshith R** | System Integration | Feature engineering, model training and comparison, Bayesian hyperparameter optimisation, HMM/Viterbi route reconstruction, FastAPI backend and deployment. |
-| **Harshitha B.T.** | Core Pipeline & ML Development | Raw data preprocessing, GPS coordinate projection, ground-truth route alignment, road-network processing, spatial indexing, candidate generation and candidate-recall analysis. |
-| **Janavi Agarwal** | Frontend Development and Visualisation | Evaluator dashboard UI, frontend implementation, interface design, API integration on the client side and presentation of route-reconstruction results. |
-| **Hemanth** | Supporting Development and Testing | Assisting with testing, validation, system integration and other supporting project activities. |
-
-**Shared responsibilities:** dataset exploration, debugging, experiment verification, report preparation, presentation and integration testing were collaborative activities.
 
 ## Dataset setup
 
