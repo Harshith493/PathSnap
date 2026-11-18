@@ -28,6 +28,13 @@ reports/
 # ── Temporary directories ────────────────────────────────
 temp_remote_repo/
 
+# ── Generated Interactive Maps (Dynamic / >100MB) ────────
+artifacts/maps/
+
+# ── Oversized Model Binaries (>20MB) ─────────────────────
+artifacts/models/knn.joblib
+artifacts/models/random_forest.joblib
+
 # ── Large zip files & extracted raw data ─────────────────
 *.zip
 PathSnap_student_materials_extracted/
